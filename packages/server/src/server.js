@@ -60,7 +60,7 @@ app.listen(listenPort);
 console.log("Home page:  " + frontEnd);
 console.log("LTI 1.3 Login URL: " + frontEnd + "/oidclogin");
 console.log("LTI 1.3 Redirect URL: " + frontEnd + "/lti13," + frontEnd + "/deeplink");
-console.log("LTI 1.3 Launch URL: " + frontEnd + "/lti13");
+console.log("LTI 1.3 Target URL: " + frontEnd + "/lti13");
 console.log("LTI 1.3 Deep Linking URL: " + frontEnd + "/deeplink");
 console.log("JWKS URL: " + frontEnd + "/.well-known/jwks.json");
 console.log("Listening on " + listenPort);

@@ -1,5 +1,13 @@
 import moment from "moment";
 import { Moment } from "moment";
+import {ISortableTableRow} from "@bb-ui-toolkit/toolkit-react";
+
+export interface IStream extends ISortableTableRow {
+    selected: boolean,
+    name: string,
+    key: string,
+    url: string
+}
 
 export interface OnlineMeetingInput {
     subject?: string,

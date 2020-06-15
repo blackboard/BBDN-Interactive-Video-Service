@@ -15,6 +15,7 @@ import { initializeIcons } from 'office-ui-fabric-react';
 import { parameters } from './util/parameters';
 import queryString from 'query-string';
 import MeetCreatedPage from './MeetCreatedPage';
+import ViewStreamsPage from './VideoList';
 
 moment.locale(navigator.language);
 
@@ -48,6 +49,7 @@ function App() {
     <Provider store={store}>
       <ConnectedRouter history={hist}>
         <Switch>
+          <Route exact path="/viewStreams" component={ViewStreamsPage} />
           <Route exact path="/createMeet" component={CreateMeetPage} />
           <Route exact path="/finalizeMeet" component={MeetCreatedPage} />
           <Route exact path="/error" component={ErrorPage} />

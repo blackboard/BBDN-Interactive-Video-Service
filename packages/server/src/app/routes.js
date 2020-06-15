@@ -180,10 +180,27 @@ module.exports = function (app) {
     res.send(deepLinkReturn);
   });
 
+  app.get('/streamData', async (req, res) => {
+    return [
+      {
+        'selected': false,
+        'name': 'Default',
+        'key': 'DEFAULT2345',
+        'url': 'https://example.com/stream1'
+      },
+      {
+        'selected': false,
+        'name': 'My Stream 1',
+        'key': 'BOBCAT21234',
+        'url': 'https://example.com/mystream1'
+      },
+    ]
+  })
+
   //=======================================================
   // Catch all
   app.get("*", (req, res) => {
     console.log("catchall - (" + req.url + ")");
-    res.redirect('/#/createMeet');
+    res.redirect('/#/viewStreams');
   });
 };
