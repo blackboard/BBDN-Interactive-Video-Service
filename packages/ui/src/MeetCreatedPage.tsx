@@ -65,7 +65,7 @@ export class MeetCreatedPageComponent extends React.Component<MeetingPageProps, 
     const requestBody = {
       "startDateTime": start,
       "endDateTime": end,
-      "subject": title,
+      "name": title,
       "description": description,
       "url": meetingUrl,
       "nonce": params.getNonce(),

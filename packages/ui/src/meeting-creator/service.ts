@@ -6,7 +6,7 @@ export function createMeetingService() {
             const requestBody = {
                 "startDateTime": meeting.startDateTime?.toISOString(),
                 "endDateTime": meeting.endDateTime?.toISOString(),
-                "subject": meeting.subject,
+                "name": meeting.name,
                 "description": meeting.description
             };
 

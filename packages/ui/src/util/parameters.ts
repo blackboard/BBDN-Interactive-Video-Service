@@ -16,7 +16,7 @@ export class parameters {
   }
 
   public getCourseName() {
-    return this._courseName;
+    return this._courseName !== undefined ? this._courseName : 'No course';
   }
 
   public setCourseName(name: string | undefined) {

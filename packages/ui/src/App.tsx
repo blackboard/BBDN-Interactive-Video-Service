@@ -53,7 +53,7 @@ function App() {
           <Route exact path="/createMeet" component={CreateMeetPage} />
           <Route exact path="/finalizeMeet" component={MeetCreatedPage} />
           <Route exact path="/error" component={ErrorPage} />
-          <Route component={CreateMeetPage} />
+          <Route component={ViewStreamsPage} />
         </Switch>
       </ConnectedRouter>
     </Provider>

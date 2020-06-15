@@ -5,14 +5,19 @@ import { AppState } from './RootReducer'
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { localizedComponentWrapper } from 'react-babelfish';
-import { OnlineMeetingInput, IStream } from './meeting-creator/models';
-import { SET_MEETING_COMMAND, CREATE_MEETING_COMMAND, CreateMeetingCommand } from './meeting-creator/actions';
+import { OnlineMeetingInput, IStream, createDefaultMeetingInput } from './meeting-creator/models';
 import { goBack, push } from 'connected-react-router';
 import { hasValidSubject, hasValidDescription } from './meeting-creator/validators';
 import { parameters } from './util/parameters';
+import {
+  SET_MEETING_COMMAND,
+  SetMeetingCommand
+} from './meeting-creator/actions';
 
+import { DefaultButton } from '@bb-ui-toolkit/toolkit-react/lib/Button';
 import { BbPanelHeader, BbPanelType, BbPanelFooter } from '@bb-ui-toolkit/toolkit-react/lib/BbPanel';
 import {ISortableTableHeader, SortableTable, SortDirection} from '@bb-ui-toolkit/toolkit-react/lib/SortableTable';
+import { defaultOnClick } from '@bb-ui-toolkit/toolkit-react/lib/utilities/analytics';
 import { Label } from '@bb-ui-toolkit/toolkit-react/lib/Label';
 import { MeetingPageProps } from './util/props';
 import { v4 as uuidv4 } from 'uuid';
@@ -31,68 +36,45 @@ const getErrorMessage = (fieldName: string) => (value: string | undefined) => {
   return '';
 };
 
-const mapStateToProps = (state : AppState) => ({
-  meeting: state.meeting.inputMeeting,
-  creationInProgress: state.meeting.creationInProgress,
-  validationFailures: {
-    invalidTitle: hasValidSubject(state.meeting.inputMeeting)
-      ? getErrorMessage('Meeting title')(state.meeting.inputMeeting.subject)
-      : 'Invalid title',
-    invalidDescription: hasValidDescription(state.meeting.inputMeeting)
-      ? getErrorMessage('Description')(state.meeting.inputMeeting.description)
-      : 'Invalid description'
-  },
-});
+interface ViewStreamsProps {
+  onNewMeeting: () => void,
+  loading: boolean,
+  localize: any,
+  cancel: () => void
+  data: IStream[];
+}
 
-const goToLinkPage = (dispatch: Dispatch, meeting: OnlineMeetingInput) => {
-  const title = encodeURIComponent(meeting.subject || '');
-  const description = encodeURIComponent(meeting.description || '');
-  const start = encodeURIComponent(meeting.startDateTime.toISOString() || '');
-  const end = encodeURIComponent(meeting.endDateTime.toISOString() || '');
-  dispatch(push(`/finalizeMeet?title=${title}&description=${description}&start=${start}&end=${end}`));
-};
+const mapStateToProps = (state : AppState) => ({});
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  setMeeting: (meeting: OnlineMeetingInput) => {
+  onNewMeeting: () => {
     dispatch({
       type: SET_MEETING_COMMAND,
-      meeting
-    })
+      meeting: createDefaultMeetingInput()
+    } as SetMeetingCommand);
+    dispatch(push('/createMeeting'));
   },
-  createMeeting: (meeting: OnlineMeetingInput) => {
-    dispatch({
-      type: CREATE_MEETING_COMMAND,
-      fromPage: "meeting",
-      meeting,
-    } as CreateMeetingCommand)
-  },
+
   cancel: () => dispatch(goBack()),
 });
 
-function CreateMeetPageComponent(props: MeetingPageProps) {
+function CreateMeetPageComponent(props: ViewStreamsProps) {
   const [validationEnabled, setValidationEnabled] = useState(false)
 
   const [data, setData] = useState<IStream[]>([]);
   useEffect(() => {
-    fetch('streamData').then(response => response.json()).then(data => {
+    fetch('/streamData').then(response => response.json()).then(data => {
       setData(data);
-      props.creationInProgress = false;
+      props.loading = false;
     });
   }, []);
 
   function onCreate()
   {
-    if (!!props.validationFailures.invalidTitle) {
-      setValidationEnabled(true);
-      return;
-    }
-
-    props.createMeeting(props.meeting);
-
-    sendMeetingToLMS(props.meeting);
+    sendMeetingToLMS(props.data);
   }
 
-  function sendMeetingToLMS(meeting: OnlineMeetingInput) {
+  function sendMeetingToLMS(data: IStream[]) {
 
     // Send request to the Node server to send the meeting to Learn
     const requestBody = {
@@ -118,7 +100,7 @@ function CreateMeetPageComponent(props: MeetingPageProps) {
     });
   }
 
-  if (props.creationInProgress) {
+  if (props.loading) {
     return (
       <div className="spinnerContainer">
         <Spinner size={SpinnerSize.large} />
@@ -129,35 +111,40 @@ function CreateMeetPageComponent(props: MeetingPageProps) {
   const headers: ISortableTableHeader[] = [
     {
       key: 'checkbox',
-      name: 'Checkbox',
+      name: props.localize.translate('ivsCreator.checkAll'),
       hidden: true,
       width: 10,
     },
     {
       key: 'name',
-      name: 'Name',
+      name: props.localize.translate('ivsCreator.streamName'),
       width: 50,
     },
     {
 
       key: 'key',
-      name: 'Stream Key',
+      name: props.localize.translate('ivsCreator.streamKey'),
       width: 50
     },
     {
       key: 'url',
-      name: 'Stream URL',
+      name: props.localize.translate('ivsCreator.streamUrl'),
       width: 200
     }
   ]
 
   return (
-    <div className="newMeetingContainer">
+    <div className="streamListContainer">
       <BbPanelHeader title={props.localize.translate('ivsCreator.interactiveVideo')} smallHeaderTitle={params.getCourseName()} type={ BbPanelType.full }/>
-      <h3>{props.localize.translate('ivsCreator.createANewIVS')}</h3>
-      <div className="meeting-valid-notice">
-        { props.localize.translate('ivsCreator.linkNotice') }
-      </div>
+      <h3>{props.localize.translate('ivsCreator.streamList')}</h3>
+      <DefaultButton
+          className="new-stream-button"
+          data-automation-id='createStreamButton'
+          description={props.localize.translate('ivsCreator.createNewStreamDesc')}
+          text={props.localize.translate('ivsCreator.createANewIVS')}
+          analyticsId='createStreamButton.button'
+          onClick={() => props.onNewMeeting()}
+      />
       <Stack
         className="container"
         verticalFill
@@ -172,7 +159,7 @@ function CreateMeetPageComponent(props: MeetingPageProps) {
                   useGrayHeader={true}
                   headers={ headers }
                   rows={ data }
-                  tableName='Interactive Streams'
+                  tableName={ props.localize.translate('ivsCreator.tableName') }
                   analyticsId='ivs.sortableTable'
               />
             </StackItem>
@@ -182,8 +169,8 @@ function CreateMeetPageComponent(props: MeetingPageProps) {
       </Stack>
       <BbPanelFooter
         primaryButtonProps={{
-          text: props.localize.translate('ivsCreator.createMeeting'),
-          ariaLabel: props.localize.translate('ivsCreator.createMeeting'),
+          text: props.localize.translate('ivsCreator.addStream'),
+          ariaLabel: props.localize.translate('ivsCreator.addStream'),
           onClick: () => onCreate()
         }}
         secondaryButtonProps={{

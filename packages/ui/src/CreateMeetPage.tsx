@@ -176,7 +176,7 @@ const mapStateToProps = (state : AppState) => ({
   creationInProgress: state.meeting.creationInProgress,
   validationFailures: {
     invalidTitle: hasValidSubject(state.meeting.inputMeeting)
-      ? getErrorMessage('Meeting title')(state.meeting.inputMeeting.subject)
+      ? getErrorMessage('Meeting title')(state.meeting.inputMeeting.name)
       : 'Invalid title',
     invalidDescription: hasValidDescription(state.meeting.inputMeeting)
       ? getErrorMessage('Description')(state.meeting.inputMeeting.description)
@@ -185,7 +185,7 @@ const mapStateToProps = (state : AppState) => ({
 });
 
 const goToLinkPage = (dispatch: Dispatch, meeting: OnlineMeetingInput) => {
-  const title = encodeURIComponent(meeting.subject || '');
+  const title = encodeURIComponent(meeting.name || '');
   const description = encodeURIComponent(meeting.description || '');
   const start = encodeURIComponent(meeting.startDateTime.toISOString() || '');
   const end = encodeURIComponent(meeting.endDateTime.toISOString() || '');
@@ -218,7 +218,7 @@ function CreateMeetPageComponent(props: MeetingPageProps) {
     // The meeting objects are small, cloning is cheap enough
     // Normally would use immutable records or similar to avoid overhead.
     const nextMeeting = _.cloneDeep(props.meeting);
-    nextMeeting.subject = newValue ?? '';
+    nextMeeting.name = newValue ?? '';
     props.setMeeting(nextMeeting);
   }
 
@@ -281,7 +281,7 @@ function CreateMeetPageComponent(props: MeetingPageProps) {
     const requestBody = {
       "startDateTime": meeting.startDateTime.toISOString(),
       "endDateTime": meeting.endDateTime.toISOString(),
-      "subject": meeting?.subject,
+      "name": meeting?.name,
       "description": meeting?.description,
       "url": meetingUrl,
       "nonce": params.getNonce(),
@@ -357,7 +357,7 @@ function CreateMeetPageComponent(props: MeetingPageProps) {
                 label={props.localize.translate('ivsCreator.meetingTitle')}
                 required={true}
                 maxLength={255}
-                value={props.meeting?.subject}
+                value={props.meeting?.name}
                 onChanged={onSubjectChanged}
                 errorMessage={validationEnabled ? props.validationFailures.invalidTitle : undefined}
               />

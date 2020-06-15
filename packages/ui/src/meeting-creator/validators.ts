@@ -2,8 +2,8 @@ import { OnlineMeetingInput } from "./models";
 
 export function hasValidSubject(meeting : OnlineMeetingInput)
 {
-    return !!meeting.subject &&
-        meeting.subject.length >= 0
+    return !!meeting.name &&
+        meeting.name.length >= 0
 }
 
 export function hasValidDescription(meeting : OnlineMeetingInput)

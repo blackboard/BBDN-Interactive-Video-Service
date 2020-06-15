@@ -117,8 +117,8 @@ module.exports = function (app) {
       const nonce = uuid.v4();
       redisUtil.redisSave(nonce, token);
 
-      // Now finally redirect to the Google Meet app
-      res.redirect(`/?nonce=${nonce}&returnurl=${returnUrl}&cname=${courseName}&setLang=${learnLocale}#/createMeet`);
+      // Now finally redirect to the IVS app
+      res.redirect(`/?nonce=${nonce}&returnurl=${returnUrl}&cname=${courseName}&setLang=${learnLocale}#/viewStreams`);
     } else {
       console.log(`Failed to get token with response ${response.status}`);
       res.send(`An error occurred getting OAuth2 token ${response.status}`);
@@ -180,8 +180,8 @@ module.exports = function (app) {
     res.send(deepLinkReturn);
   });
 
-  app.get('/streamData', async (req, res) => {
-    return [
+  app.get('/streamData', (req, res) => {
+    res.send([
       {
         'selected': false,
         'name': 'Default',
@@ -194,7 +194,7 @@ module.exports = function (app) {
         'key': 'BOBCAT21234',
         'url': 'https://example.com/mystream1'
       },
-    ]
+    ])
   })
 
   //=======================================================

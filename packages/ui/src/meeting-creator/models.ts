@@ -10,7 +10,7 @@ export interface IStream extends ISortableTableRow {
 }
 
 export interface OnlineMeetingInput {
-    subject?: string,
+    name: string,
     description?: string,
     startDateTime: Moment,
     endDateTime: Moment,
@@ -18,7 +18,7 @@ export interface OnlineMeetingInput {
 
 export function createDefaultMeetingInput(): OnlineMeetingInput {
     return {
-        subject: "",
+        name: "",
         description: "",
         startDateTime: moment().startOf('hour').add(1, 'hour'),
         endDateTime: moment().startOf('hour').add(2, 'hour'),
