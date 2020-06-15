@@ -5,7 +5,7 @@ resource "kubernetes_deployment" "google_meet_creator" {
   }
 
   metadata {
-    name      = "learn-svc-google-meet-creator"
+    name      = "learn-svc-interactive-video-service"
     namespace = var.k8s_namespace
 
     labels = local.serviceLabels
@@ -27,7 +27,7 @@ resource "kubernetes_deployment" "google_meet_creator" {
 
     template {
       metadata {
-        name      = "learn-svc-google-meet-creator"
+        name      = "learn-svc-interactive-video-service"
         namespace = var.k8s_namespace
         labels    = local.serviceLabels
         annotations = {
@@ -39,7 +39,7 @@ resource "kubernetes_deployment" "google_meet_creator" {
         volume {
           name = "config"
           config_map {
-            name = "learn-svc-google-meet-creator"
+            name = "learn-svc-interactive-video-service"
             items {
               key = "config.json"
               path = "config.json"
@@ -49,7 +49,7 @@ resource "kubernetes_deployment" "google_meet_creator" {
 
         container {
           name  = "service"
-          image = "${data.aws_caller_identity.current.account_id}.dkr.ecr.us-east-1.amazonaws.com/learn-svc/google-meet-creator:${var.image_tag}"
+          image = "${data.aws_caller_identity.current.account_id}.dkr.ecr.us-east-1.amazonaws.com/learn-svc/interactive-video-service:${var.image_tag}"
 
           security_context {
             allow_privilege_escalation = false
@@ -103,7 +103,7 @@ resource "kubernetes_deployment" "google_meet_creator" {
 
           env {
             name = "NEW_RELIC_APP_NAME"
-            value = "google-meet-creator-${var.url_suffix}"
+            value = "interactive-video-service-${var.url_suffix}"
           }
 
           env {
@@ -118,7 +118,7 @@ resource "kubernetes_deployment" "google_meet_creator" {
 
 resource "kubernetes_service" "google_meet_creator" {
   metadata {
-    name      = "learn-svc-google-meet-creator"
+    name      = "learn-svc-interactive-video-service"
     namespace = var.k8s_namespace
     labels    = local.serviceLabels
   }
@@ -135,7 +135,7 @@ resource "kubernetes_service" "google_meet_creator" {
 
 resource "kubernetes_ingress" "google_meet_creator" {
   metadata {
-    name      = "learn-svc-google-meet-creator"
+    name      = "learn-svc-interactive-video-service"
     namespace = var.k8s_namespace
 
     annotations = {

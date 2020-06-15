@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "../../services/google-meet-creator"
+  source = "../../services/interactive-video-service"
 }
 
 inputs = {

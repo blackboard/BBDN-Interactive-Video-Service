@@ -1,6 +1,6 @@
 resource "kubernetes_horizontal_pod_autoscaler" "msteams_app_lms_meetings" {
   metadata {
-    name      = "learn-svc-google-meet-creator"
+    name      = "learn-svc-interactive-video-service"
     namespace = var.k8s_namespace
     labels    = local.serviceLabels
   }

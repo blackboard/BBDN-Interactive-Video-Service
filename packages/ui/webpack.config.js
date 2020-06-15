@@ -122,7 +122,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: false,
       template: './src/index.ejs',
-      title: 'Create new Google Meet'
+      title: 'Create Interactive Video'
     }),
     new webpack.ProvidePlugin({
       "window.jQuery": "jquery"

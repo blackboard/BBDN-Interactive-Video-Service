@@ -17,7 +17,7 @@ ReactDOM.render(
     locale={appLocale}
     babelfishInstance={babelfishInstance}
     babelfishFormatInstance={babelfishFormatInstance}
-    bundlesToLoad={ ['ui/locales/[locale]/google-meet-creator.json'] }>
+    bundlesToLoad={ ['ui/locales/[locale]/ivs.json'] }>
     <App/>
   </Locale>,
   document.getElementById('root')

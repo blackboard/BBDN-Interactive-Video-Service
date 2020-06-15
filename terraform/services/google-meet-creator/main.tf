@@ -20,11 +20,11 @@ data "aws_caller_identity" "current" {}
 
 locals {
   serviceLabels = {
-    app = "google-meet-creator"
+    app = "interactive-video-service"
     Environment = var.environment
     Product = "lic"
     Component = "learnsaas-aux"
-    LayerDetail = "google-meet-creator"
+    LayerDetail = "interactive-video-service"
     Chargeback = "base"
     ClientId = "shared"
     "prometheus.io/probe" = "false"
@@ -33,7 +33,7 @@ locals {
   }
 
   serviceSelector = {
-    app = "google-meet-creator"
+    app = "interactive-video-service"
     Environment = var.environment
   }
 

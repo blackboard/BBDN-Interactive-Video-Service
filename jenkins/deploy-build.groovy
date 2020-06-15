@@ -50,14 +50,14 @@ timestamps {
             lock( "googlemeet::deploy::$params.FLEET_ID" ) {
               container( 'terragrunt' ) {
                 withEnv( [ "KUBECONFIG=/etc/kubeconfig/config" ] + tfInitArgs ) {
-                  sh "./terragrunt.sh --fleet $fleet.id --service google-meet-creator init -input=false"
+                  sh "./terragrunt.sh --fleet $fleet.id --service interactive-video-service init -input=false"
                 }
                 withEnv( [ "KUBECONFIG=/etc/kubeconfig/config" ] + tfVars ) {
 
-                  sh "./terragrunt.sh --fleet $fleet.id --service google-meet-creator plan -input=false"
+                  sh "./terragrunt.sh --fleet $fleet.id --service interactive-video-service plan -input=false"
 
                   if ( !params.DRY_RUN ) {
-                    sh "./terragrunt.sh --fleet $fleet.id --service google-meet-creator apply -input=false -auto-approve .terraform.plan"
+                    sh "./terragrunt.sh --fleet $fleet.id --service interactive-video-service apply -input=false -auto-approve .terraform.plan"
                   }
                 }
               }
@@ -65,7 +65,7 @@ timestamps {
 
             if ( !params.DRY_RUN ) {
               bbms.kubernetes.validateDeployment(
-                deploymentName: 'learn-svc-google-meet-creator',
+                deploymentName: 'learn-svc-interactive-video-service',
                 timeout: 600,
                 namespace: fleet.kubeNamespace,
                 kubeConfig: '/etc/kubeconfig',
@@ -91,7 +91,7 @@ def getTfVars( fleet ) {
 
 def getInitArgs( fleet ) {
   // Define a unique S3 key for each deployment based on configmap name
-  def s3Key = "states/google-meet-creator/${fleet.environment}/${fleet.id}.tfstate"
+  def s3Key = "states/interactive-video-service/${fleet.environment}/${fleet.id}.tfstate"
   def bucket = fleet.stateBucket
   def dynamoTable = fleet.stateDynamoTable
 

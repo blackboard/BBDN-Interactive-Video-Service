@@ -14,7 +14,7 @@ properties([
       defaultValue: true,
       description: 'Push built images to ECR' ),
     string( name: 'REPOSITORY_URL',
-      defaultValue: '392477962641.dkr.ecr.us-east-1.amazonaws.com/learn-svc/google-meet-creator',
+      defaultValue: '392477962641.dkr.ecr.us-east-1.amazonaws.com/learn-svc/interactive-video-service',
       description: 'The repository url containing the built docker images' ),
   ] )
 ])

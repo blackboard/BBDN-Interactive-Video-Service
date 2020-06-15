@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "../../services/google-meet-creator"
+  source = "../../services/interactive-video-service"
 }
 
 //TODO: if we need to deploy to animal (staging) we need configs for that and a developer.blackboard.com app registered
