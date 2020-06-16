@@ -67,7 +67,7 @@ function CreateMeetPageComponent(props: ViewStreamsProps) {
         return {
           key: stream.key,
           cells: [
-            <Checkbox label='' onChange={ toggleSelected } analyticsId='selectedChecbox'/>,
+            <Checkbox label='' onChange={ toggleSelected } analyticsId='selectedCheckbox'/>,
             <span>{stream.name}</span>,
             <span>{stream.key}</span>,
             <Link href={stream.url} target='_blank' analyticsId='basicSortableTable.example.link'>{stream.url}</Link>,
@@ -79,22 +79,20 @@ function CreateMeetPageComponent(props: ViewStreamsProps) {
     });
   }, []);
 
-  function onCreate() {
-    sendMeetingToLMS(props.data);
-  }
-
   function toggleSelected() {
 
   }
 
-  function sendMeetingToLMS(data: IStream[]) {
+  function sendMeetingToLMS() {
+    // Get the selected rows and build the JSON
 
     // Send request to the Node server to send the meeting to Learn
     const requestBody = {
       "nonce": params.getNonce(),
+      "streams": []
     };
 
-    axios.post("/sendMeeting", requestBody, {
+    axios.post("/sendStreams", requestBody, {
       headers: {
         'Content-type': 'application/json'
       }
@@ -184,7 +182,7 @@ function CreateMeetPageComponent(props: ViewStreamsProps) {
         primaryButtonProps={{
           text: props.localize.translate('ivsCreator.addStream'),
           ariaLabel: props.localize.translate('ivsCreator.addStream'),
-          onClick: () => onCreate()
+          onClick: () => sendMeetingToLMS()
         }}
         secondaryButtonProps={{
           text: props.localize.translate('ivsCreator.cancel'),

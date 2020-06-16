@@ -1,9 +1,9 @@
 {
-  "name": "@google-meet-lms-meeting-creator/server",
+  "name": "@amazon-interactive-video/server",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@google-meet-lms-meeting-creator/ui": "0.1.0",
+    "@amazon-interactive-video/ui": "0.1.0",
     "axios": "0.19.2",
     "cookie-parser": "^1.4.5",
     "ejs": "^3.0.1",

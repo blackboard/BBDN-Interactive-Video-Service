@@ -122,7 +122,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: false,
       template: './src/index.ejs',
-      title: 'Create Interactive Video'
+      title: 'Amazon Interactive Video Service'
     }),
     new webpack.ProvidePlugin({
       "window.jQuery": "jquery"

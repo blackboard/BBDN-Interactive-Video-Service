@@ -151,9 +151,9 @@ module.exports = function (app) {
     });
   });
 
-  app.post('/sendMeeting', async (req, res) => {
+  app.post('/sendStreams', async (req, res) => {
     let body = req.body;
-    console.log(`sendMeeting called: ${JSON.stringify(body)}`);
+    console.log(`sendStreams called: ${JSON.stringify(body)}`);
 
     // Get the OAuth2 bearer token from our cache based on the nonce. The nonce serves two purposes:
     // 1. Protects against CSRF
@@ -175,7 +175,7 @@ module.exports = function (app) {
       learnInfo = JSON.parse(req.cookies['learnInfo']);
     }
 
-    const deepLinkReturn = await deepLinkService.createDeepContent(body, learnInfo, token);
+    const deepLinkReturn = await deepLinkService.createDeepContent(body.streams, learnInfo, token);
     console.log(`sendMeeting got deep link return ${JSON.stringify(deepLinkReturn)}`);
     res.send(deepLinkReturn);
   });
