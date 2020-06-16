@@ -1,8 +1,7 @@
 import moment from "moment";
 import { Moment } from "moment";
-import {ISortableTableRow} from "@bb-ui-toolkit/toolkit-react";
 
-export interface IStream extends ISortableTableRow {
+export interface IStream {
     selected: boolean,
     name: string,
     key: string,

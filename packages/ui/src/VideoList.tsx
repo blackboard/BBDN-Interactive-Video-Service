@@ -17,11 +17,10 @@ import {
 import { DefaultButton } from '@bb-ui-toolkit/toolkit-react/lib/Button';
 import { BbPanelHeader, BbPanelType, BbPanelFooter } from '@bb-ui-toolkit/toolkit-react/lib/BbPanel';
 import {ISortableTableHeader, SortableTable, SortDirection} from '@bb-ui-toolkit/toolkit-react/lib/SortableTable';
-import { defaultOnClick } from '@bb-ui-toolkit/toolkit-react/lib/utilities/analytics';
-import { Label } from '@bb-ui-toolkit/toolkit-react/lib/Label';
-import { MeetingPageProps } from './util/props';
-import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import {ISortableTableRow} from "@bb-ui-toolkit/toolkit-react";
+import { Link } from '@bb-ui-toolkit/toolkit-react/lib/Link';
+import { Checkbox } from '@bb-ui-toolkit/toolkit-react/lib/Checkbox';
 
 const params = parameters.getInstance();
 
@@ -61,17 +60,31 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 function CreateMeetPageComponent(props: ViewStreamsProps) {
   const [validationEnabled, setValidationEnabled] = useState(false)
 
-  const [data, setData] = useState<IStream[]>([]);
+  const [rows, setRows] = useState<ISortableTableRow[]>([]);
   useEffect(() => {
     fetch('/streamData').then(response => response.json()).then(data => {
-      setData(data);
+      const rows = data.map((stream: IStream) => {
+        return {
+          key: stream.key,
+          cells: [
+            <Checkbox label='' onChange={ toggleSelected } analyticsId='selectedChecbox'/>,
+            <span>{stream.name}</span>,
+            <span>{stream.key}</span>,
+            <Link href={stream.url} target='_blank' analyticsId='basicSortableTable.example.link'>{stream.url}</Link>,
+          ]
+        };
+      });
+      setRows(rows);
       props.loading = false;
     });
   }, []);
 
-  function onCreate()
-  {
+  function onCreate() {
     sendMeetingToLMS(props.data);
+  }
+
+  function toggleSelected() {
+
   }
 
   function sendMeetingToLMS(data: IStream[]) {
@@ -158,7 +171,7 @@ function CreateMeetPageComponent(props: ViewStreamsProps) {
                   hasActionableCells={true}
                   useGrayHeader={true}
                   headers={ headers }
-                  rows={ data }
+                  rows={ rows }
                   tableName={ props.localize.translate('ivsCreator.tableName') }
                   analyticsId='ivs.sortableTable'
               />
