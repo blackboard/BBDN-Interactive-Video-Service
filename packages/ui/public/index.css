@@ -59,6 +59,10 @@ h3 {
   min-height: 7rem;
 }
 
+.twitch-player {
+  margin: 30px 30px;
+}
+
 .zero-state {
   margin-top: 2rem;
 }

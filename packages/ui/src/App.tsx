@@ -16,6 +16,7 @@ import { parameters } from './util/parameters';
 import queryString from 'query-string';
 import MeetCreatedPage from './MeetCreatedPage';
 import ViewStreamsPage from './VideoList';
+import WatchStreamPage from './WatchStream';
 
 moment.locale(navigator.language);
 
@@ -44,12 +45,16 @@ params.setReturnUrl(returnUrl as string);
 const courseName = queryParams?.cname;
 params.setCourseName(decodeURIComponent(courseName as string));
 
+const streamUrl = queryParams?.streamurl;
+params.setStreamUrl(decodeURIComponent(streamUrl as string));
+
 function App() {
   return (
     <Provider store={store}>
       <ConnectedRouter history={hist}>
         <Switch>
           <Route exact path="/viewStreams" component={ViewStreamsPage} />
+          <Route exact path="/watchStream" component={WatchStreamPage} />
           <Route exact path="/createMeet" component={CreateMeetPage} />
           <Route exact path="/finalizeMeet" component={MeetCreatedPage} />
           <Route exact path="/error" component={ErrorPage} />

@@ -3,6 +3,7 @@ export class parameters {
   _courseName: string | undefined;
   _nonce: string | undefined;
   _returnUrl: string | undefined;
+  private _streamUrl: string | undefined;
 
   private constructor() {
   }
@@ -16,7 +17,7 @@ export class parameters {
   }
 
   public getCourseName() {
-    return this._courseName !== undefined ? this._courseName : 'No course';
+    return this._courseName;
   }
 
   public setCourseName(name: string | undefined) {
@@ -37,5 +38,13 @@ export class parameters {
 
   public setReturnUrl(url: string | undefined) {
     this._returnUrl = url;
+  }
+
+  public getStreamUrl(): string | undefined {
+    return this._streamUrl;
+  }
+
+  public setStreamUrl(value: string | undefined) {
+    this._streamUrl = value;
   }
 }

@@ -5,7 +5,8 @@ export interface IStream {
     selected: boolean,
     name: string,
     key: string,
-    url: string
+    ingestUrl: string,
+    playbackUrl: string
 }
 
 export interface OnlineMeetingInput {

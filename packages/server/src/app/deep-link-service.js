@@ -1,11 +1,11 @@
 import axios from 'axios';
 import moment from 'moment';
 import config from '../config/config';
-import ltiAdv from './lti-adv';
+import ltiAdv from "./lti-adv";
 
 exports.createDeepContent = async (streams, learnInfo, token) => {
   // get OAuth token, make REST API call
-  console.log(`createDeepContent meeting: ${JSON.stringify(streams)}`);
+  console.log(`createDeepContent streams: ${JSON.stringify(streams)}`);
   console.log(`createDeepContent learn: ${JSON.stringify(learnInfo)}`);
 
   const xhrConfig = {
@@ -63,17 +63,25 @@ let createCalendarItem = async function (meetingInfo, learnInfo, calendarId, xhr
 };
 
 let createDeepLinkJwt = function (streams, learnInfo) {
-
   const contentItems = streams.map(stream => {
     return {
       type: "ltiResourceLink",
       title: stream.name,
       text: stream.description,
-      url: stream.url,
+      url: `${config.frontendUrl}/watchstream`,
       available: {
         startDateTime: stream.startDateTime,
         endDateTime: stream.endDateTime,
       },
+      iframe: {
+        width: 600,
+        height: 400
+      },
+      custom: {
+        streamKey: stream.key,
+        playbackUrl: stream.playbackUrl,
+        ingestUrl: stream.ingestUrl
+      }
     };
   })
 
@@ -94,7 +102,5 @@ let createDeepLinkJwt = function (streams, learnInfo) {
 
   console.log(`Deep link creator returned: ${JSON.stringify(deepLinkResponse)}`);
 
-  const jwt = ltiAdv.signJwt(deepLinkResponse);
-
-  return jwt;
+  return ltiAdv.signJwt(deepLinkResponse);
 };

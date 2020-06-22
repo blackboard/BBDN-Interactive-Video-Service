@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import ltiAdv from "./lti-adv";
 import deepLinkService from "./deep-link-service";
+import streamService from './stream-service';
 import config from "../config/config";
 import axios from "axios";
 import redisUtil from '../util/redisutil';
@@ -27,7 +28,7 @@ module.exports = function (app) {
   let jwtPayload;
 
   app.post("/deeplink", (req, res) => {
-    console.log("--------------------\nltiAdvantage deep link");
+    console.log("--------------------\ndeeplink");
 
     // Per the OIDC best practices, ensure the state parameter passed in here matches the one in our cookie
     const cookieState = req.cookies['state'];
@@ -125,6 +126,44 @@ module.exports = function (app) {
     }
   });
 
+  app.post("/watchstream", (req, res) => {
+    console.log("--------------------\nwatchstream");
+
+    // Per the OIDC best practices, ensure the state parameter passed in here matches the one in our cookie
+    const cookieState = req.cookies['state'];
+    if (cookieState !== req.body.state) {
+      res.send("The state field is missing or doesn't match.");
+      return;
+    }
+
+    jwtPayload = ltiAdv.verifyToken(req.body.id_token);
+    if (!jwtPayload || !jwtPayload.verified) {
+      res.send("An error occurred processing the id_token.");
+      return;
+    }
+
+    const returnUrl = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/launch_presentation'].return_url;
+    const learnServer = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/tool_platform'].url;
+    const lmsType = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/tool_platform'].product_family_code;
+    const streamUrl = jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/custom']['playbackUrl'];
+
+    const learnInfo = {
+      userId: jwtPayload.body['sub'],
+      courseId: jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/context'].id,
+      learnHost: learnServer,
+      returnUrl: encodeURI(returnUrl),
+      courseName: jwtPayload.body['https://purl.imsglobal.org/spec/lti/claim/context'].title,
+      locale: jwtPayload.body['locale'],
+      lmsType: lmsType,
+      iss: jwtPayload.body['iss'],
+      deployId: jwtPayload.body["https://purl.imsglobal.org/spec/lti/claim/deployment_id"],
+    };
+
+    console.log("learnInfo: " + JSON.stringify(learnInfo));
+    res.cookie("learnInfo", JSON.stringify(learnInfo), {sameSite: 'none', secure: true, httpOnly: true});
+    res.redirect(`/?cname=${learnInfo.courseName}&streamurl=${streamUrl}&setLang=${learnInfo.locale}#/watchStream`);
+  });
+
   app.get("/jwtPayloadData", (req, res) => {
     res.send(jwtPayload);
   });
@@ -165,7 +204,7 @@ module.exports = function (app) {
       res.status(404).send(`Couldn't find nonce`);
       return;
     }
-    console.log(`sendMeeting got bearer token`);
+    console.log(`sendStreams got bearer token`);
 
     // Remove the nonce so it can't be replayed
     redisUtil.redisDelete(nonce);
@@ -176,25 +215,21 @@ module.exports = function (app) {
     }
 
     const deepLinkReturn = await deepLinkService.createDeepContent(body.streams, learnInfo, token);
-    console.log(`sendMeeting got deep link return ${JSON.stringify(deepLinkReturn)}`);
+    console.log(`sendStreams got deep link return ${JSON.stringify(deepLinkReturn)}`);
     res.send(deepLinkReturn);
   });
 
-  app.get('/streamData', (req, res) => {
-    res.send([
-      {
-        'selected': false,
-        'name': 'Default',
-        'key': 'DEFAULT2345',
-        'url': 'https://example.com/stream1'
-      },
-      {
-        'selected': false,
-        'name': 'My Stream 1',
-        'key': 'BOBCAT21234',
-        'url': 'https://example.com/mystream1'
-      },
-    ])
+  app.get('/streamData', async (req, res) => {
+    // Now that we've gotten through all the authentication hoops, we need to load/create our streams
+    let learnInfo = {};
+    if (req.cookies['learnInfo']) {
+      learnInfo = JSON.parse(req.cookies['learnInfo']);
+    }
+
+    console.log(`streamData for ${learnInfo.courseId}`)
+    const streams = await streamService.loadStreams(learnInfo.courseId);
+
+    res.send(streams);
   })
 
   //=======================================================

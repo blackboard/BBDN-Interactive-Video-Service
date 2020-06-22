@@ -5,9 +5,8 @@ import { AppState } from './RootReducer'
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { localizedComponentWrapper } from 'react-babelfish';
-import { OnlineMeetingInput, IStream, createDefaultMeetingInput } from './meeting-creator/models';
+import { IStream, createDefaultMeetingInput } from './meeting-creator/models';
 import { goBack, push } from 'connected-react-router';
-import { hasValidSubject, hasValidDescription } from './meeting-creator/validators';
 import { parameters } from './util/parameters';
 import {
   SET_MEETING_COMMAND,
@@ -28,18 +27,11 @@ const params = parameters.getInstance();
 // Video list page component
 //
 
-const getErrorMessage = (fieldName: string) => (value: string | undefined) => {
-  if (value) {
-    return value.length <= 255 ? '' : `${fieldName} cannot be longer than 255 characters`;
-  }
-  return '';
-};
-
 interface ViewStreamsProps {
-  onNewMeeting: () => void,
-  loading: boolean,
-  localize: any,
-  cancel: () => void
+  onNewMeeting: () => void;
+  loading: boolean;
+  localize: any;
+  cancel: () => void;
   data: IStream[];
 }
 
@@ -57,10 +49,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   cancel: () => dispatch(goBack()),
 });
 
-function CreateMeetPageComponent(props: ViewStreamsProps) {
-  const [validationEnabled, setValidationEnabled] = useState(false)
-
+function ViewStreamsPageComponent(props: ViewStreamsProps) {
   const [rows, setRows] = useState<ISortableTableRow[]>([]);
+  const [streamData, setStreamData] = useState<IStream[]>([]);
   useEffect(() => {
     fetch('/streamData').then(response => response.json()).then(data => {
       const rows = data.map((stream: IStream) => {
@@ -70,17 +61,18 @@ function CreateMeetPageComponent(props: ViewStreamsProps) {
             <Checkbox label='' onChange={ toggleSelected } analyticsId='selectedCheckbox'/>,
             <span>{stream.name}</span>,
             <span>{stream.key}</span>,
-            <Link href={stream.url} target='_blank' analyticsId='basicSortableTable.example.link'>{stream.url}</Link>,
+            <Link href={stream.playbackUrl} target='_blank' analyticsId='basicSortableTable.example.playback'>{stream.playbackUrl}</Link>,
+            <Link href={stream.ingestUrl} target='_blank' analyticsId='basicSortableTable.example.ingest'>{stream.ingestUrl}</Link>
           ]
         };
       });
       setRows(rows);
+      setStreamData(data);
       props.loading = false;
     });
   }, []);
 
   function toggleSelected() {
-
   }
 
   function sendMeetingToLMS() {
@@ -89,7 +81,7 @@ function CreateMeetPageComponent(props: ViewStreamsProps) {
     // Send request to the Node server to send the meeting to Learn
     const requestBody = {
       "nonce": params.getNonce(),
-      "streams": []
+      "streams": streamData
     };
 
     axios.post("/sendStreams", requestBody, {
@@ -138,8 +130,13 @@ function CreateMeetPageComponent(props: ViewStreamsProps) {
       width: 50
     },
     {
-      key: 'url',
-      name: props.localize.translate('ivsCreator.streamUrl'),
+      key: 'playbackUrl',
+      name: props.localize.translate('ivsCreator.playbackUrl'),
+      width: 200
+    },
+    {
+      key: 'ingestUrl',
+      name: props.localize.translate('ivsCreator.ingestUrl'),
       width: 200
     }
   ]
@@ -195,4 +192,4 @@ function CreateMeetPageComponent(props: ViewStreamsProps) {
   );
 }
 
-export default localizedComponentWrapper(connect(mapStateToProps, mapDispatchToProps)(CreateMeetPageComponent));
+export default localizedComponentWrapper(connect(mapStateToProps, mapDispatchToProps)(ViewStreamsPageComponent));
