@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Stack, StackItem, Spinner, SpinnerSize } from 'office-ui-fabric-react';
 import { AppState } from './RootReducer'
@@ -35,7 +35,8 @@ interface ViewStreamsProps {
   data: IStream[];
 }
 
-const mapStateToProps = (state : AppState) => ({});
+const mapStateToProps = (state : AppState) => ({
+});
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   onNewMeeting: () => {
@@ -58,7 +59,7 @@ function ViewStreamsPageComponent(props: ViewStreamsProps) {
         return {
           key: stream.key,
           cells: [
-            <Checkbox label='' onChange={ toggleSelected } analyticsId='selectedCheckbox'/>,
+            <Checkbox label='' name={stream.key} onChange={ toggleSelected } analyticsId='selectedCheckbox'/>,
             <span>{stream.name}</span>,
             <span>{stream.key}</span>,
             <Link href={stream.playbackUrl} target='_blank' analyticsId='basicSortableTable.example.playback'>{stream.playbackUrl}</Link>,
@@ -72,11 +73,22 @@ function ViewStreamsPageComponent(props: ViewStreamsProps) {
     });
   }, []);
 
-  function toggleSelected() {
+  function toggleSelected(event: any, isChecked: boolean | undefined) {
+    console.log(`Toggle event name ${event.target.name}`);
+    console.log(`Stream data ${JSON.stringify(streamData)}`);
+    console.log(`Sending stream data rows ${JSON.stringify(rows)}`);
+    streamData.forEach(s => {
+      console.log(`Toggle s.key ${s.key}`);
+      if (s.key == event?.target.name) {
+        s.selected = isChecked as boolean;
+      }
+    });
   }
 
-  function sendMeetingToLMS() {
+  function sendStreamToLMS() {
     // Get the selected rows and build the JSON
+    console.log(`Sending stream data ${JSON.stringify(streamData)}`);
+    console.log(`Sending stream data rows ${JSON.stringify(rows)}`);
 
     // Send request to the Node server to send the meeting to Learn
     const requestBody = {
@@ -179,7 +191,7 @@ function ViewStreamsPageComponent(props: ViewStreamsProps) {
         primaryButtonProps={{
           text: props.localize.translate('ivsCreator.addStream'),
           ariaLabel: props.localize.translate('ivsCreator.addStream'),
-          onClick: () => sendMeetingToLMS()
+          onClick: () => sendStreamToLMS()
         }}
         secondaryButtonProps={{
           text: props.localize.translate('ivsCreator.cancel'),

@@ -1,5 +1,4 @@
 import React, { useRef, useLayoutEffect } from 'react';
-import {localizedComponentWrapper} from "react-babelfish";
 
 interface ITwitchPlayerProps {
   streamUrl: string | undefined;

@@ -64,26 +64,28 @@ let createCalendarItem = async function (meetingInfo, learnInfo, calendarId, xhr
 
 let createDeepLinkJwt = function (streams, learnInfo) {
   const contentItems = streams.map(stream => {
-    return {
-      type: "ltiResourceLink",
-      title: stream.name,
-      text: stream.description,
-      url: `${config.frontendUrl}/watchstream`,
-      available: {
-        startDateTime: stream.startDateTime,
-        endDateTime: stream.endDateTime,
-      },
-      iframe: {
-        width: 600,
-        height: 400
-      },
-      custom: {
-        streamKey: stream.key,
-        playbackUrl: stream.playbackUrl,
-        ingestUrl: stream.ingestUrl
-      }
-    };
-  })
+    if (stream.selected) {
+      return {
+        type: "ltiResourceLink",
+        title: stream.name,
+        text: stream.description,
+        url: `${config.frontendUrl}/watchstream`,
+        available: {
+          startDateTime: stream.startDateTime,
+          endDateTime: stream.endDateTime,
+        },
+        iframe: {
+          width: 600,
+          height: 400
+        },
+        custom: {
+          streamKey: stream.key,
+          playbackUrl: stream.playbackUrl,
+          ingestUrl: stream.ingestUrl
+        }
+      };
+    }
+  });
 
   const now = moment.now() / 1000;
   const deepLinkResponse = {
@@ -103,4 +105,4 @@ let createDeepLinkJwt = function (streams, learnInfo) {
   console.log(`Deep link creator returned: ${JSON.stringify(deepLinkResponse)}`);
 
   return ltiAdv.signJwt(deepLinkResponse);
-};
+}
